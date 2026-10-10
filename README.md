@@ -7,7 +7,7 @@ local GPU, CUDA, PyTorch or ComfyUI install required on your laptop.
 
 > **Open in Colab**
 >
-> [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/REPLACE_WITH_YOUR/ai-video-studio/blob/main/colab/ComfyUI_Video_Generation.ipynb)
+> [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Farmington1/comfy/blob/main/colab/ComfyUI_Video_Generation.ipynb)
 >
 > The badge works only with a **public github.com** copy of this repo. If you
 > host it on an enterprise/private Git server, mirror it to github.com (or
