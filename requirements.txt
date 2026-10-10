@@ -1,0 +1,24 @@
+# ======================================================================
+# AI Video Studio - orchestration/helper dependencies
+# ----------------------------------------------------------------------
+# These are the packages used by the scripts in scripts/ and the Colab
+# notebook to install, validate, download, launch and drive ComfyUI.
+#
+# NOTE: This file does NOT pin PyTorch/CUDA or ComfyUI's own requirements.
+#   * In Google Colab, a CUDA-enabled PyTorch is already provided by the
+#     runtime; scripts/install_comfyui.py reuses it and only installs
+#     ComfyUI's requirements.txt on top.
+#   * ComfyUI itself is pinned by git tag in config/settings.yaml.
+#
+# Pinned with lower bounds that are known-compatible with Colab (2026).
+# ======================================================================
+
+PyYAML>=6.0,<7.0
+requests>=2.31,<3.0
+tqdm>=4.66
+huggingface_hub>=0.25,<1.0
+
+# Notebook validation / local dev & tests (not needed on the GPU runtime)
+nbformat>=5.9
+jsonschema>=4.0
+pytest>=7.4

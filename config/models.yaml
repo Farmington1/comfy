@@ -1,0 +1,135 @@
+# ======================================================================
+# AI Video Studio - model manifest
+# ----------------------------------------------------------------------
+# Every file this project may download, pinned by exact filename + size.
+# `size` (bytes) is used for integrity validation after download (a full
+# re-download is triggered if the on-disk size does not match).
+#
+# Models are grouped into TIERS. download_models.py downloads one or more
+# tiers. The default tier (config/settings.yaml -> project.default_tier)
+# is `base`, which is enough to run t2v, i2v and fast_preview.
+#
+# All Wan 2.2 weights are redistributed by Comfy-Org and are Apache-2.0
+# licensed (original: Wan-AI). They are PUBLIC - no HF token required.
+# Source: https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged
+# ======================================================================
+
+# Convenience bases for building resolve URLs.
+_hf_base: &hf_repackaged https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files
+
+license: Apache-2.0
+license_url: https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged
+
+# Named tiers -> list of model keys (see `models` below).
+tiers:
+  base:        [umt5_fp8, wan22_vae, wan5b_ti2v]
+  quality:     [umt5_fp8, wan21_vae, wan14b_t2v_high, wan14b_t2v_low]
+  i2v_14b:     [umt5_fp8, wan21_vae, wan14b_i2v_high, wan14b_i2v_low]
+  # Optional 4-step Lightning LoRAs (big speed-up, slight quality trade-off)
+  speed_loras: [lora_t2v_high, lora_t2v_low]
+  # Optional low-VRAM quantized path (requires ComfyUI-GGUF custom node;
+  # see docs/MODELS.md for how to swap UNETLoader -> UnetLoaderGGUF).
+  gguf:        [umt5_fp8, wan21_vae, gguf_t2v_high_q4, gguf_t2v_low_q4]
+
+models:
+  # ---- Shared encoder / VAEs ----------------------------------------
+  umt5_fp8:
+    filename: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    dest: text_encoders
+    url: *hf_repackaged
+    suburl: /text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    size: 6735906897
+    gated: false
+
+  wan22_vae:
+    filename: wan2.2_vae.safetensors
+    dest: vae
+    url: *hf_repackaged
+    suburl: /vae/wan2.2_vae.safetensors
+    size: 1409400960
+    gated: false
+
+  wan21_vae:
+    filename: wan_2.1_vae.safetensors
+    dest: vae
+    url: *hf_repackaged
+    suburl: /vae/wan_2.1_vae.safetensors
+    size: 253815318
+    gated: false
+
+  # ---- base tier: Wan 2.2 TI2V 5B (t2v + i2v + fast_preview) ----------
+  wan5b_ti2v:
+    filename: wan2.2_ti2v_5B_fp16.safetensors
+    dest: diffusion_models
+    url: *hf_repackaged
+    suburl: /diffusion_models/wan2.2_ti2v_5B_fp16.safetensors
+    size: 9999658848
+    gated: false
+
+  # ---- quality tier: Wan 2.2 14B Text-to-Video (two-stage) -----------
+  wan14b_t2v_high:
+    filename: wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors
+    dest: diffusion_models
+    url: *hf_repackaged
+    suburl: /diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors
+    size: 14293923632
+    gated: false
+
+  wan14b_t2v_low:
+    filename: wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors
+    dest: diffusion_models
+    url: *hf_repackaged
+    suburl: /diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors
+    size: 14293923632
+    gated: false
+
+  # ---- optional: Wan 2.2 14B Image-to-Video (two-stage) --------------
+  wan14b_i2v_high:
+    filename: wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors
+    dest: diffusion_models
+    url: *hf_repackaged
+    suburl: /diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors
+    size: 14294742832
+    gated: false
+
+  wan14b_i2v_low:
+    filename: wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors
+    dest: diffusion_models
+    url: *hf_repackaged
+    suburl: /diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors
+    size: 14294742832
+    gated: false
+
+  # ---- optional Lightning 4-step LoRAs (speed) -----------------------
+  lora_t2v_high:
+    filename: wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors
+    dest: loras
+    url: *hf_repackaged
+    suburl: /loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors
+    size: 1226977424
+    gated: false
+
+  lora_t2v_low:
+    filename: wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors
+    dest: loras
+    url: *hf_repackaged
+    suburl: /loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors
+    size: 1226977424
+    gated: false
+
+  # ---- optional GGUF (low VRAM); from QuantStack, Apache-2.0 ---------
+  gguf_t2v_high_q4:
+    filename: Wan2.2-T2V-A14B-HighNoise-Q4_K_M.gguf
+    dest: diffusion_models
+    url: https://huggingface.co/QuantStack/Wan2.2-T2V-A14B-GGUF/resolve/main
+    suburl: /HighNoise/Wan2.2-T2V-A14B-HighNoise-Q4_K_M.gguf
+    size: 9650090496
+    gated: false
+
+  gguf_t2v_low_q4:
+    filename: Wan2.2-T2V-A14B-LowNoise-Q4_K_M.gguf
+    dest: diffusion_models
+    url: https://huggingface.co/QuantStack/Wan2.2-T2V-A14B-GGUF/resolve/main
+    suburl: /LowNoise/Wan2.2-T2V-A14B-LowNoise-Q4_K_M.gguf
+    size: 9650090496
+    gated: false

@@ -1,0 +1,58 @@
+# ---- AI Video Studio ignores ----
+
+# ComfyUI itself is installed at runtime (never committed)
+ComfyUI/
+comfyui/
+
+# Model weights (large, downloaded at runtime)
+*.safetensors
+*.ckpt
+*.gguf
+*.pt
+*.pth
+*.bin
+models/weights/
+
+# Generated media & runtime artifacts
+outputs/
+inputs/
+runtime/
+logs/
+*.mp4
+*.webm
+*.gif
+*.png
+*.jpg
+*.jpeg
+# ...but keep tiny repo assets if ever needed
+!docs/**/*.png
+!workflows/**/*.png
+
+# Secrets / credentials
+.env
+*.env
+!.env.example
+drive_credentials.json
+*.key
+token.txt
+hf_token*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Colab / Jupyter scratch
+*.log

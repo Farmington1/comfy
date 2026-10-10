@@ -1,0 +1,120 @@
+# ======================================================================
+# AI Video Studio - global settings
+# Central, version-pinned configuration consumed by every script and the
+# Colab notebook. Edit here to update the whole environment reproducibly.
+# ======================================================================
+
+project:
+  name: ai-video-studio
+  # Model tier downloaded by default (see config/models.yaml -> tiers).
+  default_tier: base
+
+# ---------------------------------------------------------------------
+# ComfyUI - pinned for reproducibility.
+# Pin by immutable git tag; the installer checks out exactly this ref.
+# ---------------------------------------------------------------------
+comfyui:
+  repo: https://github.com/comfyanonymous/ComfyUI.git
+  # Release tag verified against Wan 2.2 native nodes (Wan22ImageToVideoLatent,
+  # EmptyHunyuanLatentVideo, CreateVideo, SaveVideo) on 2026-10-10.
+  version: v0.39.2
+  commit: 3c1b7a17fdf2
+  # Where ComfyUI is installed on the Colab VM (local SSD, NOT Google Drive -
+  # Drive is too slow for live inference).
+  install_dir: /content/ComfyUI
+
+# ---------------------------------------------------------------------
+# Local (Colab VM) directory layout. These live on the fast local disk.
+# Google Drive mirrors are configured in the `drive` section below.
+# ---------------------------------------------------------------------
+paths:
+  # Relative to comfyui.install_dir unless absolute.
+  models_dir: models            # ComfyUI/models/<diffusion_models|vae|...>
+  input_dir: input              # ComfyUI/input  (reference images for i2v)
+  output_dir: output            # ComfyUI/output (generated videos)
+  user_dir: user                # ComfyUI/user
+  logs_dir: /content/ai-video-studio-logs
+
+# ---------------------------------------------------------------------
+# Local ComfyUI API server (bound to localhost on the Colab VM).
+# IMPORTANT: On the FREE Colab tier, exposing a public web UI (ngrok /
+# cloudflared tunnel) is against Colab's terms. The default compliant path
+# submits workflows to this LOCAL API from notebook cells.
+# ---------------------------------------------------------------------
+server:
+  host: 127.0.0.1
+  port: 8188
+  # Extra flags passed to ComfyUI's main.py. --disable-auto-launch keeps it
+  # headless. VRAM mode is chosen automatically by validate_environment.
+  extra_args: "--disable-auto-launch"
+  startup_timeout_sec: 300
+
+# ---------------------------------------------------------------------
+# Google Drive persistence (optional but recommended).
+# ---------------------------------------------------------------------
+drive:
+  enabled: true
+  mount_point: /content/drive
+  # Folder created under MyDrive.
+  root: AI-Video-Studio
+  subdirs:
+    - models
+    - workflows
+    - inputs
+    - outputs
+    - configs
+    - logs
+  # Mirror model weights to Drive so they survive runtime resets.
+  cache_models: true
+
+# ---------------------------------------------------------------------
+# GPU / VRAM tiering. Used by validate_environment.py to recommend a
+# model tier and ComfyUI VRAM flags. Values are approximate guidance,
+# NOT hard blocks - ComfyUI offloads to system RAM when VRAM is tight.
+# ---------------------------------------------------------------------
+gpu:
+  # VRAM (GiB) -> recommended tier + flags. Evaluated top-down; first match
+  # whose `min_vram_gib` <= detected VRAM wins.
+  profiles:
+    - name: a100_80
+      min_vram_gib: 70
+      recommended_tier: quality
+      recommended_workflow: high_quality
+      comfy_vram_flag: ""            # default/highvram handled by ComfyUI
+    - name: a100_40
+      min_vram_gib: 38
+      recommended_tier: quality
+      recommended_workflow: high_quality
+      comfy_vram_flag: ""
+    - name: l4_24
+      min_vram_gib: 22
+      recommended_tier: base
+      recommended_workflow: wan_text_to_video
+      comfy_vram_flag: ""
+    - name: t4_16
+      min_vram_gib: 14
+      recommended_tier: base
+      recommended_workflow: fast_preview
+      comfy_vram_flag: "--lowvram"
+    - name: small
+      min_vram_gib: 0
+      recommended_tier: gguf
+      recommended_workflow: fast_preview
+      comfy_vram_flag: "--lowvram"
+  # Minimums below which we warn loudly.
+  min_vram_gib_warn: 12
+  min_disk_gib_warn: 25
+  min_ram_gib_warn: 12
+
+# ---------------------------------------------------------------------
+# Generation defaults (can be overridden per-run from the notebook).
+# ---------------------------------------------------------------------
+generation:
+  default_workflow: wan_text_to_video
+  negative_prompt: >-
+    blurry, low quality, low resolution, distorted, deformed, static,
+    overexposed, washed out, jpeg artifacts, watermark, text, subtitles,
+    extra limbs, bad hands, mutated, duplicate frames
+  # Polling interval (seconds) while waiting for a job on the local API.
+  poll_interval_sec: 2
+  job_timeout_sec: 3600
